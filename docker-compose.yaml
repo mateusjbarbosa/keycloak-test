@@ -1,0 +1,48 @@
+version: '3'
+
+services: 
+  keycloak:
+    image: jboss/keycloak:12.0.4
+    environment: 
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_ADDR=db
+      - DB_PORT=5432
+      - DB_DATABASE=keycloak_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+    ports:
+      - 8080:8080
+    networks: 
+      - keycloak_network
+    depends_on: 
+      - db
+  
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment: 
+  #     - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #     - PGADMIN_LISTEN_PORT=8081
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on: 
+  #     - db
+  #   networks: 
+  #     - keycloak_network
+  
+  db:
+    image: postgres:9.6.21
+    environment: 
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=keycloak_db
+    volumes: 
+      - .docker/dbdata:/var/lib/postgresql/data
+    networks:
+      - keycloak_network
+
+networks: 
+  keycloak_network:
+    driver: bridge
